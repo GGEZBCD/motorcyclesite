@@ -80,42 +80,20 @@
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
                 <input type="submit" id="login-btn" value="Login">
-                <input type="submit" id="register-btn" value="Register" style="margin-left: 10px;">
+                <input type="button" id="register-btn" value="Register" style="margin-left: 10px;">
                 <button type="button" id="logout-btn">Logout</button>
             </form>
         </div>
     </div>
     <script>
-        document.getElementById('auth-form').addEventListener('submit', async function(event) {
+        document.getElementById('login-btn').addEventListener('click', async function(event) {
             event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const isLogin = event.submitter.id === 'login-btn';
-            const endpoint = isLogin ? '/login' : '/register';
+            await handleAuth('/login');
+        });
 
-            try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    alert(data.message);
-                    if (isLogin) {
-                        localStorage.setItem('accessToken', data.accessToken);
-                        localStorage.setItem('refreshToken', data.refreshToken);
-                        document.getElementById('logout-btn').style.display = 'block';
-                    }
-                } else {
-                    alert(data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
+        document.getElementById('register-btn').addEventListener('click', async function(event) {
+            event.preventDefault();
+            await handleAuth('/register');
         });
 
         document.getElementById('logout-btn').addEventListener('click', function() {
@@ -130,6 +108,37 @@
                 document.getElementById('logout-btn').style.display = 'block';
             }
         });
+
+        async function handleAuth(endpoint) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    if (endpoint === '/login') {
+                        localStorage.setItem('accessToken', data.accessToken);
+                        localStorage.setItem('refreshToken', data.refreshToken);
+                        document.getElementById('logout-btn').style.display = 'block';
+                    } else if (endpoint === '/register') {
+                        alert('Registration successful! You can now log in.');
+                    }
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
     </script>
 </body>
 </html>

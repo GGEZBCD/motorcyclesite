@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motorcycle Bio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .container {
+            padding: 20px;
+        }
+        .bio {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .login-form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .login-form input[type="text"],
+        .login-form input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .login-form input[type="submit"] {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .login-form input[type="submit"]:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Motorcycle Bio</h1>
+    </header>
+    <div class="container">
+        <div class="bio">
+            <p>The motorcycle, an iconic symbol of freedom and adventure, has a storied history that spans over a century. Originally developed as a motorized bicycle in the late 19th century, it quickly evolved into a powerful and versatile machine. Known for their speed, agility, and efficiency, motorcycles have been utilized for a variety of purposes, from military operations to recreational riding. With advancements in technology, modern motorcycles boast impressive features like advanced safety systems, high-performance engines, and sleek, aerodynamic designs. Today, they continue to captivate enthusiasts around the world, embodying a unique blend of engineering excellence and the thrill of the open road.</p>
+        </div>
+        <div class="login-form">
+            <h2>Login</h2>
+            <form action="/login" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <input type="submit" value="Registration">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

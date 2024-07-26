@@ -3,22 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motorcycle Bio 2</title>
+    <title>Garrett's Cycle Works</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Oswald', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: #2c2c2c;
+            color: #f4f4f4;
+            overflow: hidden; /* Prevents scroll during loading animation */
         }
         header {
-            background-color: #333;
             color: #fff;
             padding: 10px 0;
             text-align: center;
             position: relative;
+            overflow: hidden;
+            font-size: 3em;
+            background-color: transparent; /* Transparent background */
+        }
+        header h1 {
+            margin: 0;
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+        }
+        header h1::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #0033cc, #ff6600); /* Gradient for shimmer effect */
+            animation: shimmer 2s infinite;
+            z-index: 1;
+        }
+        header h1 span {
+            position: relative;
+            z-index: 2;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        .loading-overlay {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+        }
+        .spinner {
+            border: 8px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top: 8px solid #fff;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .username-display {
             position: absolute;
@@ -29,11 +81,14 @@
             padding: 20px;
         }
         .bio {
-            background-color: #fff;
-            padding: 20px;
+            background-color: #333;
+            color: #f4f4f4;
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
             margin-bottom: 20px;
+            font-size: 1.5em;
+            line-height: 1.6;
         }
         .motorcycle-images {
             display: grid;
@@ -41,16 +96,38 @@
             gap: 20px;
             margin-bottom: 20px;
         }
+        .motorcycle-images .image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            height: 250px;
+            cursor: pointer;
+        }
         .motorcycle-images img {
             width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .motorcycle-images .caption {
+            position: absolute;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 1.2em;
+        }
+        .motorcycle-images .image-container:hover img {
+            transform: scale(1.1);
         }
         .login-form {
-            background-color: #fff;
+            background-color: #333;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
         }
         .login-form label {
             display: block;
@@ -62,7 +139,7 @@
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ccc;
+            border: 1px solid #555;
             border-radius: 4px;
         }
         .login-form .button-container {
@@ -71,7 +148,7 @@
         }
         .login-form input[type="submit"] {
             width: 48%;
-            background-color: #333;
+            background-color: #0033cc; /* Default color for Login button */
             color: #fff;
             padding: 10px;
             border: none;
@@ -79,11 +156,17 @@
             cursor: pointer;
         }
         .login-form input[type="submit"]:hover {
-            background-color: #555;
+            background-color: #002a80;
+        }
+        .login-form input[type="submit"]#register-btn {
+            background-color: #ff6600; /* Orange color for Register button */
+        }
+        .login-form input[type="submit"]#register-btn:hover {
+            background-color: #cc5200;
         }
         .login-form button {
             width: 100%;
-            background-color: #333;
+            background-color: #0033cc;
             color: #fff;
             padding: 10px;
             border: none;
@@ -92,30 +175,78 @@
             display: none;
         }
         .login-form button:hover {
-            background-color: #555;
+            background-color: #002a80;
         }
         .error-message {
             color: red;
             margin-top: -10px;
             margin-bottom: 10px;
         }
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #333;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            color: #f4f4f4;
+        }
+        .close {
+            color: #f4f4f4;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Garrett's Cycle Works</h1>
+        <h1><span>Garrett's Cycle Works</span></h1>
         <div class="username-display" id="username-display"></div>
     </header>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
     <div class="container">
         <div class="bio">
-            <p>The motorcycle, an iconic symbol of freedom and adventure, has made a staple in history that spans over a century, with technological advancements motorcycles today make everyday commuting an awesome experience that you just can't obtain with other vehicles.</p>
-            <p>Below are a few of the most iconic motorcycles ever manufactured:</p>
+            <p>The motorcycle has become an enduring icon of freedom and adventure, evolving over a century to enhance our everyday experiences. With remarkable technological advancements, modern motorcycles provide an unparalleled blend of excitement and practicality.</p>
+            <p>Discover below a selection of motorcycles, each representing a unique blend of style, performance, and heritage:</p>
         </div>
         <div class="motorcycle-images">
-            <img src="path-to-your-image1.jpg" alt="Motorcycle 1">
-            <img src="path-to-your-image2.jpg" alt="Motorcycle 2">
-            <img src="path-to-your-image3.jpg" alt="Motorcycle 3">
-            <img src="path-to-your-image4.jpg" alt="Motorcycle 4">
+            <div class="image-container" data-info="The Yamaha R1 is a 998cc inline-four cylinder sport bike, known for its performance and advanced electronics, especially around the track.">
+                <img src="/Users/garrettbates/Desktop/motorcyclesite/Yamaha R1.jpg" alt="Yamaha R1">
+                <div class="caption">Yamaha R1</div>
+            </div>
+            <div class="image-container" data-info="The Harley Davidson 107 is part of the Milwaukee-Eight family, featuring a 1746cc V-Twin engine, known for its torque and iconic design.">
+                <img src="/Users/garrettbates/Desktop/motorcyclesite/Harley.jpg" alt="Harley Davidson 107">
+                <div class="caption">Harley Davidson 107</div>
+            </div>
+            <div class="image-container" data-info="The Honda Africa Twin is an adventure motorcycle with a 998cc parallel-twin engine, renowned for its off-road capabilities and long-distance comfort.">
+                <img src="/Users/garrettbates/Desktop/motorcyclesite/African Twin.jpg" alt="Honda Africa Twin">
+                <div class="caption">Honda Africa Twin</div>
+            </div>
+            <div class="image-container" data-info="The Triumph Thruxton 900 is a modern classic with an 865cc parallel-twin engine, known for its retro styling and spirited performance.">
+                <img src="/Users/garrettbates/Desktop/motorcyclesite/Thruxton 900.jpg" alt="Triumph Thruxton 900">
+                <div class="caption">Triumph Thruxton 900</div>
+            </div>
         </div>
         <div class="login-form" id="login-form">
             <h2>Login/Register</h2>
@@ -133,103 +264,79 @@
                 <div id="password-error" class="error-message"></div>
                 
                 <div class="button-container">
-                    <input type="submit" id="login-btn" value="Login">
+                    <input type="submit" id="login-btn" value="Login" disabled>
                     <input type="submit" id="register-btn" value="Register">
                 </div>
             </form>
             <button type="button" id="logout-btn">Logout</button>
         </div>
     </div>
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Motorcycle Description</h2>
+            <p id="modal-description">Some description about the motorcycle..</p>
+        </div>
+    </div>
     <script>
-        document.getElementById('auth-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
+        // Script to handle the loading overlay and modal
+        window.addEventListener('load', function() {
+            document.getElementById('loading-overlay').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Re-enable scroll after loading
+        });
+
+        // Disable login button initially
+        const loginBtn = document.getElementById('login-btn');
+        loginBtn.disabled = true;
+
+        // Handle form submission
+        document.getElementById('auth-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+        
             const username = document.getElementById('username').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const isLogin = event.submitter.id === 'login-btn';
-            const endpoint = isLogin ? 'http://ec2-3-144-146-118.us-east-2.compute.amazonaws.com:8080/login' : 'http://ec2-3-144-146-118.us-east-2.compute.amazonaws.com:8080/register';
+            const registerBtn = document.getElementById('register-btn');
 
-            console.log('Form submitted:', { username, email, password });
+            //if & else if statement
+            
+            if (event.submitter === registerBtn) {
+               
+                alert('Registration successful! You can now log in.');
 
-            // Clear previous error messages
-            document.getElementById('username-error').innerText = '';
-            document.getElementById('email-error').innerText = '';
-            document.getElementById('password-error').innerText = '';
-
-            // Validate username
-            if (username.length > 6) {
-                document.getElementById('username-error').innerText = 'Username must be no longer than 6 characters.';
-                console.log('Validation failed: Username too long');
-                alert('Validation Error!');
-                return;
-            }
-
-            // Validate email ONLY if registering
-            if (!isLogin) {
-                const emailRegEx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegEx.test(email)) {
-                    document.getElementById('email-error').innerText = 'Please enter a valid email address.';
-                    console.log('Validation failed: Invalid email');
-                    alert('Validation Error!');
-                    return;
-                }
-            }
-
-            // Validate password
-            const passwordRegEx = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$/;
-            if (!passwordRegEx.test(password)) {
-                document.getElementById('password-error').innerText = 'Password must be at least 8 characters long, include a number, an uppercase letter, and a special character.';
-                console.log('Validation failed: Weak password');
-                alert('Validation Error!');
-                return;
-            }
-
-            try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, email, password })
-                });
-
-                const data = await response.json();
-                console.log('Server response:', data);
-
-                if (response.ok) {
-                    alert('Success!');
-                    localStorage.setItem('accessToken', data.accessToken);
-                    localStorage.setItem('refreshToken', data.refreshToken);
-                    document.getElementById('logout-btn').style.display = 'block';
-                    document.getElementById('auth-form').style.display = 'none';
-                    document.getElementById('username-display').innerText = `Welcome, ${username}`;
-                } else {
-                    alert(`Fail! Reason: ${data.message || 'Unknown error'}`);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert(`Fail! Reason: ${error.message}`);
+                // Enable login button
+                loginBtn.disabled = false;
+            } else if (event.submitter === loginBtn && loginBtn.disabled) {
+                // If the login button is clicked while disabled, show alert
+                alert('You must register first');
+            } else if (event.submitter === loginBtn) {
+                // Redirect to success page
+                window.location.href = 'success.html';
             }
         });
 
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            alert('Logged out successfully');
-            document.getElementById('logout-btn').style.display = 'none';
-            document.getElementById('auth-form').reset(); // Reset the form fields
-            document.getElementById('auth-form').style.display = 'block';
-            document.getElementById('username-display').innerText = '';
+        // Modal Functionality
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+
+        document.querySelectorAll('.image-container').forEach(item => {
+            item.addEventListener('click', function() {
+                var info = this.getAttribute('data-info');
+                document.getElementById('modal-description').textContent = info;
+                modal.style.display = "block";
+            });
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            if (localStorage.getItem('accessToken')) {
-                document.getElementById('logout-btn').style.display = 'block';
-                document.getElementById('auth-form').style.display = 'none';
-                const username = 'User'; // Default to "User" if username is not stored
-                document.getElementById('username-display').innerText = `Welcome, ${username}`;
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
             }
-        });
+        }
     </script>
 </body>
 </html>
